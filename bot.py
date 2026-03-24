@@ -7,7 +7,7 @@ import config  # твой файл с BOT_TOKEN, CHANNEL_ID, ADMINS
 
 # --- Инициализация ---
 bot = Bot(token=config.BOT_TOKEN)
-dp = Dispatcher()  # без аргументов
+dp = Dispatcher()
 
 # --- Загрузка продуктов ---
 with open("products.json", "r", encoding="utf-8") as f:
@@ -35,13 +35,15 @@ async def is_subscribed(user_id: int):
 
 # --- Клавиатура с продуктами ---
 def products_keyboard():
-    kb = InlineKeyboardMarkup(inline_keyboard=[], row_width=1)  # <- добавили пустой список
-    for p in products:
-        kb.add(InlineKeyboardButton(
+    buttons = [
+        [InlineKeyboardButton(
             text=f"{p['name']} — {p['price']}",
             callback_data=f"buy_{p['id']}"
-        ))
-    return kb
+        )]
+        for p in products
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons, row_width=1)
+
 # --- Команда /start ---
 @dp.message(Command(commands=["start"]))
 async def start(message: types.Message):
@@ -60,13 +62,13 @@ async def start(message: types.Message):
         save_db()
 
     await message.answer(
-        "Привет! Добро пожаловать в Happy Shop 🛍️\nВыбирай своего брейнрота:",
+        "Привет! Добро пожаловать в Happy Shop 🛍️\nВыбирай своего продукта:",
         reply_markup=products_keyboard()
     )
 
 # --- Обработка покупки (callback) ---
 @dp.callback_query(lambda c: c.data.startswith("buy_"))
-async def buy_brainrot(query: types.CallbackQuery):
+async def buy_product(query: types.CallbackQuery):
     user_id = str(query.from_user.id)
     product_id = query.data.split("_")[1]
 
