@@ -2,12 +2,12 @@ import json
 import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram.filters import Command, Text
-import config  # файл с BOT_TOKEN, CHANNEL_ID, ADMINS
+from aiogram.filters import Command
+import config  # твой файл с BOT_TOKEN, CHANNEL_ID, ADMINS
 
 # --- Инициализация ---
 bot = Bot(token=config.BOT_TOKEN)
-dp = Dispatcher()  # ⚠️ без аргументов
+dp = Dispatcher()  # без аргументов
 
 # --- Загрузка продуктов ---
 with open("products.json", "r", encoding="utf-8") as f:
@@ -50,7 +50,9 @@ async def start(message: types.Message):
 
     # Проверка подписки
     if not await is_subscribed(user_id):
-        await message.answer(f"Пожалуйста, подпишись на канал, чтобы пользоваться магазином: {config.CHANNEL_ID}")
+        await message.answer(
+            f"Пожалуйста, подпишись на канал, чтобы пользоваться магазином: {config.CHANNEL_ID}"
+        )
         return
 
     # Добавление пользователя в базу
@@ -63,8 +65,8 @@ async def start(message: types.Message):
         reply_markup=products_keyboard()
     )
 
-# --- Обработка покупки ---
-@dp.callback_query(Text(startswith="buy_"))
+# --- Обработка покупки (callback) ---
+@dp.callback_query(lambda c: c.data.startswith("buy_"))
 async def buy_brainrot(query: types.CallbackQuery):
     user_id = str(query.from_user.id)
     product_id = query.data.split("_")[1]
