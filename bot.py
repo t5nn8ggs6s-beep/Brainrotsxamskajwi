@@ -35,14 +35,13 @@ async def is_subscribed(user_id: int):
 
 # --- Клавиатура с продуктами ---
 def products_keyboard():
-    kb = InlineKeyboardMarkup(row_width=1)
+    kb = InlineKeyboardMarkup(inline_keyboard=[], row_width=1)  # <- добавили пустой список
     for p in products:
         kb.add(InlineKeyboardButton(
             text=f"{p['name']} — {p['price']}",
             callback_data=f"buy_{p['id']}"
         ))
     return kb
-
 # --- Команда /start ---
 @dp.message(Command(commands=["start"]))
 async def start(message: types.Message):
